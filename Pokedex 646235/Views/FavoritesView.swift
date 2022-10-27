@@ -12,30 +12,52 @@ import SwiftUI
 struct FavoritesView: View {
     @EnvironmentObject var favorites: PokemonFavorites
     @State var pokemonDetailed: PokemonDetailed?
+    @EnvironmentObject var pokemonStore: PokemonStore
     
     private let pokeAPI: PokeAPI = PokeAPI()
-
+    
+    let columns = [
+        GridItem(.adaptive(minimum: 150))
+    ]
+    
     var body: some View {
-        if (favorites.ids.count != 0){
-            Text("Favorite Pokemons")
-                .bold()
-            HStack{
+        VStack(alignment: .leading, spacing: 10){
+            if (!favorites.ids.isEmpty){
                 
-                ForEach(favorites.ids, id: \.self) { favorite in
-                    
-//                    PokemonCell(pokemon: Pokemon(id: favorite, name: pokemonDetailed.name))
-//                        .onAppear(perform: getPokemonDetails(pokemonId: favorite))
-
+                NavigationView {
                     
                     
+                    ScrollView {
+                        Text("Favorite Pokémon’s")
+                            .bold()                        .font(.system(size: 33))
+                        LazyVGrid(columns: columns, spacing: 20) {
+                            
+                            var pokemons = pokemonStore.pokemons
+                            
+                            ForEach(pokemons.filter({ favorites.ids.contains($0.id) })) { favoritePokemon in
+                                var pokemon = Pokemon(id: favoritePokemon.id, name: favoritePokemon.name)
+                                
+                                NavigationLink(destination: PokemonDetailView(pokemon: pokemon)) {
+                                    PokemonCell(pokemon: pokemon)
+                                }
+                                
+                            }
+                            
+                        }
+                        
+                    }
                     
                 }
-            }         
+                Spacer()
+                
+            }
+            
+            else{
+                Text("You don't have any favorites!")
+            }
+            
+      
         }
-        else{
-            Text("You don't have any favorites!")
-        }
-        
     }
     
     

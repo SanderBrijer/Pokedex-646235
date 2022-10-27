@@ -13,16 +13,35 @@ struct ContentView: View {
     let columns = [
         GridItem(.adaptive(minimum: 150))
     ]
-
+    
     
     var body: some View {
         TabView{
             NavigationView {
-                
-                
                 ScrollView {
-                Text("All Pokémon’s")
-                        .bold()                        .font(.system(size: 33))
+                    if (pokemonStore.pokemons == nil) {
+                        Text("Could not fetch...")
+                    }
+                    else {
+                    Text("All Pokémon’s")
+                        .bold()
+                        .font(.system(size: 33))
+                    
+                    Button(
+                        action: {
+                            pokemonStore.loadData()
+                        },
+                        label: {
+                            
+                            Image(systemName: "arrow.counterclockwise")
+                        }
+                    )
+//                    .onTapGesture {
+//                        withAnimation {
+//                            
+//                        }
+//                    }
+                    
                     LazyVGrid(columns: columns, spacing: 20) {
                         ForEach(pokemonStore.pokemons) { pokemon in
                             NavigationLink(destination: PokemonDetailView(pokemon: pokemon)) {
@@ -31,14 +50,15 @@ struct ContentView: View {
                         }
                     }
                     .padding(.horizontal)
+                    }
                 }
                 .onAppear(perform: handleOnAppear)
                 
                 
             }
-    
+            
             .tabItem(){
-                Image("pokebol")
+                Image("pokebol").renderingMode(.template)
                 Text("Pokemon")
             }
             FavoritesView()
@@ -54,8 +74,13 @@ struct ContentView: View {
 private extension ContentView {
     
     func handleOnAppear() {
-        pokemonStore.loadData()
+        do {
+              try  pokemonStore.loadData()
+        } catch {
+         print("Could not fetch pokemons")
+        }
     }
+    
 }
 
 struct ContentView_Previews: PreviewProvider {

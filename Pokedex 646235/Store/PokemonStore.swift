@@ -12,6 +12,11 @@ class PokemonStore: ObservableObject {
      
     private let pokeAPI: PokeAPI = PokeAPI()
     
+    func reLoadData(){
+        self.pokemons = []
+        loadData()
+    }
+    
     func loadData() {
         pokeAPI.fetchAllPokemons(completion: { result in
             switch result {
